@@ -70,6 +70,10 @@ export default function Login() {
             </div>
             <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>{isSubmitting ? 'Logging in…' : 'Log in'}</Button>
           </form>
+          <p className="text-sm text-slate-500 mt-6 text-center">
+            New to Smart Gym?{' '}
+            <Link to="/register" className="text-brand-600 hover:underline font-medium">Create an account</Link>
+          </p>
           <div className="mt-6 rounded-lg bg-slate-100 p-3 text-xs text-slate-600">
             <p className="font-semibold mb-1">Demo accounts (after seeding)</p>
             <p>admin@gym.com / Admin@123 · reception@gym.com / Staff@123</p>
