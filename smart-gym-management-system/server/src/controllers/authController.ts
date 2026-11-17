@@ -8,6 +8,7 @@ import {
 } from '../utils/tokens';
 import { env } from '../config/env';
 import { writeAudit } from '../utils/audit';
+import { ensureMemberProfile } from '../services/memberProfileService';
 
 const REFRESH_COOKIE = 'refresh_token';
 
@@ -40,16 +41,20 @@ export const registerSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
   password: z.string().min(8, 'Password must be at least 8 characters'),
+  phone: z.string().min(5).optional(),
   role: z.enum(['super_admin', 'gym_admin', 'receptionist', 'trainer', 'member']).optional(),
 });
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
-  const { name, email, password } = req.body as z.infer<typeof registerSchema>;
+  const { name, email, password, phone } = req.body as z.infer<typeof registerSchema>;
   // Public self-registration is member-only; staff accounts are created by admins via /api/users.
   const role: Role = 'member';
   const existing = await User.findOne({ email: email.toLowerCase() });
   if (existing) throw badRequest('An account with this email already exists');
   const user = await User.create({ name, email: email.toLowerCase(), passwordHash: await hashPassword(password), role });
+  // Give the new login a member profile right away (or link the profile the
+  // front desk already made for this email) so the portal works immediately.
+  await ensureMemberProfile(user._id, phone);
   const accessToken = await issueTokens(user, res);
   await writeAudit({ actorId: String(user._id), action: 'auth.register', entity: 'User', entityId: String(user._id), ip: req.ip });
   res.status(201).json({ success: true, data: { user: publicUser(user), accessToken } });
