@@ -12,6 +12,7 @@ import { Input, Label, FieldError } from '../../components/ui/input';
 const schema = z.object({
   name: z.string().min(2, 'Enter your full name'),
   email: z.string().email('Enter a valid email'),
+  phone: z.string().min(5, 'Enter a valid phone number').optional().or(z.literal('')),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string().min(1, 'Please confirm your password'),
 }).refine(values => values.password === values.confirmPassword, {
@@ -30,7 +31,7 @@ export default function Register() {
   const onSubmit = async (values: FormValues) => {
     setError('');
     try {
-      const user = await registerUser(values.name, values.email, values.password);
+      const user = await registerUser(values.name, values.email, values.password, values.phone?.trim() || undefined);
       navigate(homePathForRole(user.role), { replace: true });
     } catch (err) {
       setError(apiErrorMessage(err, 'Sign up failed'));
@@ -65,6 +66,11 @@ export default function Register() {
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" placeholder="you@example.com" {...register('email')} />
               <FieldError message={errors.email?.message} />
+            </div>
+            <div>
+              <Label htmlFor="phone">Phone (optional)</Label>
+              <Input id="phone" type="tel" placeholder="03xx xxxxxxx" {...register('phone')} />
+              <FieldError message={errors.phone?.message} />
             </div>
             <div>
               <Label htmlFor="password">Password</Label>
