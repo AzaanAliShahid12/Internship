@@ -7,6 +7,7 @@ import { asyncHandler } from '../utils/asyncHandler';
 import { badRequest, notFound, forbidden } from '../utils/ApiError';
 import { pageParams, pageResult } from '../utils/pagination';
 import { memberWithMembership } from '../services/membershipService';
+import { ensureMemberProfile } from '../services/memberProfileService';
 import { toCsv } from '../utils/csv';
 import { writeAudit } from '../utils/audit';
 import { notify } from '../services/notificationService';
@@ -145,9 +146,11 @@ export const memberPayments = asyncHandler(async (req: Request, res: Response) =
   res.json({ success: true, data: pageResult(items, total, p) });
 });
 
-/** Member-portal: resolve the member record linked to the logged-in user. */
+/** Member-portal: resolve the member record linked to the logged-in user.
+ *  Self-registered accounts get their profile created/linked on first use,
+ *  so a website sign-up never lands on a dead end. */
 export async function resolveOwnMember(req: Request) {
-  const member = await Member.findOne({ user: req.user!.id });
+  const member = await ensureMemberProfile(req.user!.id);
   if (!member) throw notFound('No member profile is linked to this account');
   return member;
 }
