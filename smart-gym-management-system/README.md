@@ -5,6 +5,14 @@ A complete, production-quality gym management platform with **QR code check-in**
 trainers and members, memberships, payments, attendance, reports and real-time
 updates — all backed by a real MongoDB database. No mock data, no dummy buttons.
 
+## Live Demo
+
+- **Website (frontend):** https://internship-weconnect1.vercel.app
+- **Backend API:** https://internship-production-c84dac16.up.railway.app
+
+Open the website and log in with any demo account listed below, or use
+"Create an account" on the login page to sign up as a new member.
+
 ## Highlights
 
 - **Two entrance methods** — unique revocable QR credentials (random token, SHA-256
